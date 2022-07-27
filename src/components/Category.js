@@ -20,22 +20,26 @@ import { addToCart } from "../actions";
 class Category extends React.Component {
   state = { productHoverId: "", data: null };
 
+  // Function for fetching the category data
   fetchCategory() {
     queryFetch(GET_CATEGORY, {
       title: this.props.category,
     }).then((result) => this.setState({ data: result.data }));
   }
 
+  // Fetching the category data when page loads
   componentDidMount() {
     this.fetchCategory();
   }
 
+  // Fetchin the category data when state changes
   componentDidUpdate(prevProps, prevState) {
     if (prevState.data === this.state.data) {
       this.fetchCategory();
     }
   }
 
+  // Rendering the category based on the fetched data
   renderCategory = () => {
     if (!this.state.data) return;
     return this.state.data.category.products.map((product) => {
@@ -93,10 +97,12 @@ class Category extends React.Component {
     });
   };
 
+  // Controls the hover effects of the category-item
   onProductHover = (id) => {
     this.setState({ productHoverId: id });
   };
 
+  // Controls the hover effects of the category-item
   onProductLeave = () => {
     this.setState({ productHoverId: "" });
   };

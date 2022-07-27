@@ -124,8 +124,8 @@ class Bag extends React.Component {
     return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  // Calculating the total price of items in cart
   totalPrice = () => {
-    // Calculating the total price of items in cart
     const prices = [];
     this.props.cart.forEach((cartItem) => {
       cartItem.prices.forEach((price) => {
