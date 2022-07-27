@@ -1,6 +1,5 @@
-import { gql } from "@apollo/client";
-
-export const GET_CATEGORIES = gql`
+// Creating constants for querying
+export const GET_CATEGORIES = `
   {
     categories {
       name
@@ -8,9 +7,9 @@ export const GET_CATEGORIES = gql`
   }
 `;
 
-export const GET_CATEGORY = gql`
-  query getCategory($category: String!) {
-    category(input: { title: $category }) {
+export const GET_CATEGORY = `
+  query getCategory($title: String!) {
+    category(input: { title: $title }) {
       name
       products {
         id
@@ -40,7 +39,7 @@ export const GET_CATEGORY = gql`
   }
 `;
 
-export const GET_CURRENCIES = gql`
+export const GET_CURRENCIES = `
   {
     currencies {
       label

@@ -1,12 +1,17 @@
 import React from "react";
+import "./Header.css";
 
-// importing gql stuff
-import { useQuery } from "@apollo/client";
-import { GET_CATEGORIES } from "../queries";
-
-// importing action creators
+// Importing connect to map the state to props
 import { connect } from "react-redux";
 
+// Importing link to route around the page
+import { Link } from "react-router-dom";
+
+// Importing the initialized function for querying
+import { GET_CATEGORIES } from "../queries";
+import queryFetch from "../api/queryFetch.js";
+
+// importing action creators
 import { selectCategory } from "../actions";
 import { selectCurrency } from "../actions";
 import { toggleCurrency } from "../actions";
@@ -16,32 +21,10 @@ import { toggleCart } from "../actions";
 import { ReactComponent as HeaderLogo } from "../images/logo-transparent.svg";
 import { ReactComponent as CartLogo } from "../images/shopping-cart.svg";
 import { ReactComponent as DropdownLogo } from "../images/dropdown-icon.svg";
-import { Link } from "react-router-dom";
-
-import "./Header.css";
-
-// Fetching the categories
-const GetCategories = ({ selectedCategory, selectCategory }) => {
-  const { loading, error, data } = useQuery(GET_CATEGORIES);
-
-  if (loading) return null;
-  if (error) return <p>Error :(</p>;
-
-  return data.categories.map((category, i) => {
-    return (
-      <Link to="/" className="category-link" key={i}>
-        <li
-          className={`${category.name === selectedCategory ? "selected" : ""}`}
-          onClick={() => selectCategory(category.name)}
-        >
-          {category.name}
-        </li>
-      </Link>
-    );
-  });
-};
 
 class Header extends React.Component {
+  state = { data: null };
+
   // Event listener to body to close the currency menu
   componentDidMount() {
     document.addEventListener("mousedown", (e) => {
@@ -52,13 +35,38 @@ class Header extends React.Component {
         this.props.toggleCurrency(false);
       }
     });
+
+    // Fetching the categories and storing them to data
+    queryFetch(GET_CATEGORIES).then((result) =>
+      this.setState({ data: result.data })
+    );
   }
 
+  // Calculating the total quantity of the items added to cart
   cartItemQuantity = () => {
     return this.props.cart.reduce(
       (cur, cartItem) => cur + cartItem.quantity,
       0
     );
+  };
+
+  // Rendering the categories in the header
+  renderCategories = () => {
+    if (!this.state.data) return;
+    return this.state.data.categories.map((category, i) => {
+      return (
+        <Link to="/" className="category-link" key={i}>
+          <li
+            className={`${
+              category.name === this.props.category ? "selected" : ""
+            }`}
+            onClick={() => this.props.selectCategory(category.name)}
+          >
+            {category.name}
+          </li>
+        </Link>
+      );
+    });
   };
 
   render() {
@@ -67,12 +75,7 @@ class Header extends React.Component {
         <div className="header-logo">
           <HeaderLogo />
         </div>
-        <nav className="header-navigation">
-          <GetCategories
-            selectedCategory={this.props.category}
-            selectCategory={this.props.selectCategory}
-          />
-        </nav>
+        <nav className="header-navigation">{this.renderCategories()}</nav>
         <div className="header-actions">
           <div
             className="currency"

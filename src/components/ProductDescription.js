@@ -1,14 +1,17 @@
 import React from "react";
 import "./ProductDescription.css";
 
+// Importing an initialized function and a constant for querying
 import queryFetch from "../api/queryFetch";
+import { GET_PRODUCT } from "../queries";
 
+// Importing actions
 import { addProductToPDP } from "../actions";
 import { selectProductAttribute } from "../actions";
 import { addToCart } from "../actions";
 
+// Importing connect to map the state to props
 import { connect } from "react-redux";
-import { GET_PRODUCT } from "../queries";
 
 class ProductDescription extends React.Component {
   constructor(props) {
@@ -17,15 +20,12 @@ class ProductDescription extends React.Component {
       selectedImageId: 0,
       renderPage: false,
     };
-    this.imageRef = React.createRef();
-    this.imageParentRef = React.createRef();
   }
 
   // Fetch the data about the product depending on the url
   componentDidMount() {
     // Fetching the product by the id that was passed down
     const id = this.props.match.params.id;
-
     queryFetch(GET_PRODUCT, {
       id: id,
     }).then((data) => this.props.addProductToPDP(data.data.product));
@@ -56,6 +56,8 @@ class ProductDescription extends React.Component {
       if (i === this.state.selectedImageId) {
         return <img key={i} src={image} className="selected-image" alt="" />;
       }
+
+      return null;
     });
   };
 
@@ -100,12 +102,15 @@ class ProductDescription extends React.Component {
                 </li>
               );
             }
+
+            return null;
           })}
         </ul>
       </div>
     );
   };
 
+  // Render the details like brand, name, price, add to cart
   renderProductDetails = () => {
     const product = this.props.product.product;
     if (!product) return;

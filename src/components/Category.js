@@ -1,13 +1,15 @@
 import React from "react";
 import "./Category.css";
 
+// Importing connect to map the state to props
 import { connect } from "react-redux";
+
+// Importing link for routing around the page
 import { Link } from "react-router-dom";
 
-// Importing for querying
+// Importing constants and the initialized function for querying
 import { GET_CATEGORY } from "../queries";
-import { queryFetch } from "../api/queryFetch";
-import { useQuery } from "@apollo/client";
+import queryFetch from "../api/queryFetch";
 
 // Importing icon
 import { ReactComponent as ShoppingIcon } from "../images/circle-icon.svg";
@@ -15,75 +17,83 @@ import { ReactComponent as ShoppingIcon } from "../images/circle-icon.svg";
 // Importing actions
 import { addToCart } from "../actions";
 
-const GetCategory = ({
-  category,
-  onProductHover,
-  onProductLeave,
-  productHoverId,
-  currency,
-  addToCart,
-}) => {
-  const { loading, error, data } = useQuery(GET_CATEGORY, {
-    variables: { category: category },
-  });
-
-  if (loading) return <div></div>;
-  if (error) return <div>Something went wrong...</div>;
-
-  return data.category.products.map((product) => {
-    return (
-      <div
-        className="product-card"
-        key={product.id}
-        onMouseEnter={() => onProductHover(product.id)}
-        onMouseLeave={() => onProductLeave()}
-      >
-        <Link
-          to={`${product.inStock ? `product/${product.id}` : "/"}`}
-          className="category-link"
-        >
-          <div className="product-image">
-            <img src={product.gallery[0]} alt="" />
-            <div className={`${product.inStock ? "in-stock" : "out-of-stock"}`}>
-              <p>OUT OF STOCK</p>
-            </div>
-          </div>
-        </Link>
-        <div
-          className={`product-details ${
-            product.inStock ? "" : "out-of-stock-details"
-          }`}
-        >
-          <div className="product-title">{product.name}</div>
-          <div className="product-price">
-            {currency}{" "}
-            {product.prices.map((price) =>
-              price.currency.symbol === currency ? price.amount : null
-            )}{" "}
-          </div>
-          {product.inStock ? (
-            <div
-              className={`shopping-icon ${
-                productHoverId === product.id ? "shopping-icon-active" : ""
-              }`}
-              onClick={() => addToCart(product)}
-            >
-              <ShoppingIcon />
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
-    );
-  });
-};
-
 class Category extends React.Component {
-  state = { productHoverId: "" };
+  state = { productHoverId: "", data: null };
+
+  fetchCategory() {
+    queryFetch(GET_CATEGORY, {
+      title: this.props.category,
+    }).then((result) => this.setState({ data: result.data }));
+  }
+
+  componentDidMount() {
+    this.fetchCategory();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.data === this.state.data) {
+      this.fetchCategory();
+    }
+  }
+
+  renderCategory = () => {
+    if (!this.state.data) return;
+    return this.state.data.category.products.map((product) => {
+      return (
+        <div
+          className="product-card"
+          key={product.id}
+          onMouseEnter={() => this.onProductHover(product.id)}
+          onMouseLeave={() => this.onProductLeave()}
+        >
+          <Link
+            to={`${product.inStock ? `product/${product.id}` : "/"}`}
+            className="category-link"
+          >
+            <div className="product-image">
+              <img src={product.gallery[0]} alt="" />
+              <div
+                className={`${product.inStock ? "in-stock" : "out-of-stock"}`}
+              >
+                <p>OUT OF STOCK</p>
+              </div>
+            </div>
+          </Link>
+          <div
+            className={`product-details ${
+              product.inStock ? "" : "out-of-stock-details"
+            }`}
+          >
+            <div className="product-title">{product.name}</div>
+            <div className="product-price">
+              {this.props.currency}{" "}
+              {product.prices.map((price) =>
+                price.currency.symbol === this.props.currency
+                  ? price.amount
+                  : null
+              )}{" "}
+            </div>
+            {product.inStock ? (
+              <div
+                className={`shopping-icon ${
+                  this.state.productHoverId === product.id
+                    ? "shopping-icon-active"
+                    : ""
+                }`}
+                onClick={() => this.props.addToCart(product)}
+              >
+                <ShoppingIcon />
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
+      );
+    });
+  };
 
   onProductHover = (id) => {
-    console.log();
     this.setState({ productHoverId: id });
   };
 
@@ -95,16 +105,7 @@ class Category extends React.Component {
     return (
       <div className="category">
         <h1>{this.props.category}</h1>
-        <div className="grid-container--cards">
-          <GetCategory
-            category={this.props.category}
-            onProductHover={this.onProductHover}
-            onProductLeave={this.onProductLeave}
-            productHoverId={this.state.productHoverId}
-            currency={this.props.currency}
-            addToCart={this.props.addToCart}
-          />
-        </div>
+        <div className="grid-container--cards">{this.renderCategory()}</div>
       </div>
     );
   }

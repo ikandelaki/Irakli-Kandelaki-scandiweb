@@ -1,10 +1,16 @@
 import React from "react";
 import "./App.css";
+
+// Importing routers for setting the routes of the page
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import { connect } from "react-redux/es/exports";
+// importing action creators
 import { toggleCart, toggleCurrency } from "../actions";
 
+// Importing connect to map the state to props
+import { connect } from "react-redux/es/exports";
+
+// Importing components
 import Header from "./Header";
 import Category from "./Category";
 import CurrencySwitcher from "./CurrencySwitcher";

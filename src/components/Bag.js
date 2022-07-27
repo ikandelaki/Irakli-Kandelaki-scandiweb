@@ -1,12 +1,13 @@
 import React from "react";
 import "./Bag.css";
 
+// importing action creators
+import { selectAttribute, addToCart, removeFromCart } from "../actions";
+
+// Importing connect to map the state to props
 import { connect } from "react-redux";
 
 import { Link } from "react-router-dom";
-
-// Importing actions
-import { selectAttribute, addToCart, removeFromCart } from "../actions";
 
 class Bag extends React.Component {
   // Render Attributes of a cart item
@@ -53,6 +54,8 @@ class Bag extends React.Component {
                   </li>
                 );
               }
+
+              return null;
             })}
           </ul>
         </div>
@@ -116,6 +119,11 @@ class Bag extends React.Component {
     );
   };
 
+  // Puts commas after every thousand to make it more user friendly
+  thousandsWithCommas(x) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   totalPrice = () => {
     // Calculating the total price of items in cart
     const prices = [];
@@ -127,10 +135,10 @@ class Bag extends React.Component {
       });
     });
     return prices.reduce((cur, price) => cur + price).toFixed(2);
+    // Make the price look better by putting commas after every thousand
   };
 
   render() {
-    console.log(this.props.cart);
     return (
       <div className="bag-container">
         <h1>Cart</h1>
@@ -146,7 +154,9 @@ class Bag extends React.Component {
               {/* Tax value */}
               <span>
                 {this.props.currency}
-                {((this.totalPrice() * 21) / 100).toFixed(2)}
+                {this.thousandsWithCommas(
+                  ((this.totalPrice() * 21) / 100).toFixed(2)
+                )}
               </span>
               {/* Number of items */}
               <span>
@@ -158,7 +168,7 @@ class Bag extends React.Component {
               {/* Price of items */}
               <span>
                 {this.props.currency}
-                {this.totalPrice()}
+                {this.thousandsWithCommas(this.totalPrice())}
               </span>
             </div>
             <div className="order-btn">Order</div>

@@ -1,6 +1,7 @@
 import React from "react";
 import "./MiniCart.css";
 
+// Importing connect to map the state to props
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -66,6 +67,8 @@ class MiniCart extends React.Component {
                   </li>
                 );
               }
+
+              return null;
             })}
           </ul>
         </div>
@@ -104,6 +107,7 @@ class MiniCart extends React.Component {
     );
   };
 
+  // Render the cart items
   renderItems() {
     return this.props.cart.map((item) => {
       return (
@@ -129,10 +133,13 @@ class MiniCart extends React.Component {
     });
   }
 
-  totalPrice = () => {
-    // if (!this.props.cart) return;
+  // Puts commas after every thousand to make it more user friendly
+  thousandsWithCommas(x) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  }
 
-    // Calculating the total price of items in cart
+  // Calculating the total price of items in cart
+  totalPrice = () => {
     const prices = [];
     this.props.cart.forEach((cartItem) => {
       cartItem.prices.forEach((price) => {
@@ -141,7 +148,9 @@ class MiniCart extends React.Component {
           : null;
       });
     });
-    return prices.reduce((cur, price) => cur + price).toFixed(2);
+    const price = prices.reduce((cur, price) => cur + price).toFixed(2);
+    // Make the price look better by putting commas after every thousand
+    return this.thousandsWithCommas(price);
   };
 
   render() {

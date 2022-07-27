@@ -35,7 +35,6 @@
 .header-navigation li:hover {
   cursor: pointer;
   color: #5ece7b;
-  /* border-bottom: 2px solid rgba(94, 206, 124, 0.5); */
 }
 
 .header-navigation li {
@@ -49,7 +48,8 @@
 li.selected {
   font-weight: 600;
   color: #5ece7b;
-  border-bottom: 2px solid #5ece7b;
+  /* border-bottom: 2px solid rgba(94, 206, 124, 0.5); */
+  box-shadow: 0 2px 1px -1px #5ece7b;
 }
 
 .header-actions {
