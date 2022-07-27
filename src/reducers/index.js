@@ -45,6 +45,7 @@ const cartReducer = (cart = initialCart, action) => {
   // Add item to cart
   if (action.type === "ADD_TO_CART") {
     const payload = action.payload.product;
+
     const item = cart.cartItems.find((product) => product.id === payload.id);
     if (item) {
       return {
