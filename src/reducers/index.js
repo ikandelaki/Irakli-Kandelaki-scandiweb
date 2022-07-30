@@ -46,119 +46,92 @@ const cartReducer = (cart = initialCart, action) => {
   if (action.type === "ADD_TO_CART") {
     const payload = action.payload.product;
 
-    const item = cart.cartItems.find((product) => product.id === payload.id);
-    if (item) {
-      return {
-        ...cart,
-        cartItems: cart.cartItems.map((item) =>
-          item.id === payload.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        ),
-      };
+    // If the product has attributes AND was added from the category page, we want to set the selected
+    // property of all the first cart attributes' items to true and false to every other
+    if (
+      payload.attributes.length &&
+      !payload.attributes[0].items[0].hasOwnProperty("selected")
+    ) {
+      payload.attributes.forEach((attribute) => {
+        attribute.items.forEach((attrItem, i) => {
+          i === 0 ? (attrItem.selected = true) : (attrItem.selected = false);
+        });
+      });
     }
+    const items = cart.cartItems.filter((product) => product.id === payload.id);
+    // A variable to determine whether the item with the same selected attributes already exists
+    let itemAlreadyExists = false;
 
-    // Adding the "selected" properties to attributes
-    // to easily change them later when selected
-    // By default first ones are set to be "selected: true"
-    if (action.payload.fromPDP) {
-      const itemSpread = {
-        ...payload,
-        quantity: 1,
-      };
+    // If there are items with the same id, we want to determine whether that item is unique
+    // (It's the only one that has the selected attributes the way it has)
+    // And return that item with quantity: 1, or if it already exists we want to increase the quantity
+    if (items.length) {
+      const sameItem = items.find(
+        (item) =>
+          JSON.stringify(item.attributes) === JSON.stringify(payload.attributes)
+      );
 
-      return {
-        ...cart,
-        cartItems: [...cart.cartItems, itemSpread],
-      };
-    } else {
-      const itemSpread = {
-        ...payload,
-        quantity: 1,
-        attributes: payload.attributes.map((attribute) => {
-          return {
-            ...attribute,
-            items: attribute.items.map((item, i) => {
-              return {
-                ...item,
-                selected: i === 0 ? true : false,
-              };
-            }),
-          };
-        }),
-      };
-      return {
-        ...cart,
-        cartItems: [...cart.cartItems, itemSpread],
-      };
-    }
-  }
+      if (sameItem) itemAlreadyExists = true;
 
-  // Select the attribute and change the "selected" property to true
-  if (action.type === "SELECT_ATTRIBUTE") {
-    const { payload } = action;
-    const itemSpread = {
-      ...payload.product,
-      attributes: payload.product.attributes.map((attribute) => {
-        if (attribute.id === payload.attributeId) {
-          return {
-            ...attribute,
-            items: attribute.items.map((item) => {
-              if (item.id === payload.attributeItemId) {
-                return {
-                  ...item,
-                  selected: true,
-                };
-              } else {
-                return {
-                  ...item,
-                  selected: false,
-                };
-              }
-            }),
-          };
-        } else {
-          return {
-            ...attribute,
-          };
-        }
-      }),
-    };
+      // If the item with same selected attributes already exits, we want to increase the quantity
+      if (itemAlreadyExists) {
+        return {
+          ...cart,
+          cartItems: cart.cartItems.map((cartItem) => {
+            if (JSON.stringify(cartItem) === JSON.stringify(sameItem)) {
+              return { ...sameItem, quantity: sameItem.quantity + 1 };
+            } else {
+              return { ...cartItem };
+            }
+          }),
+        };
 
-    const cartItems = cart.cartItems.map((item) => {
-      if (item.id === payload.itemId) {
-        return itemSpread;
+        // If the item with the same selected attributes does not already exist, we want to add a new product
       } else {
-        return item;
+        const newProduct = { ...payload, quantity: 1 };
+        return { ...cart, cartItems: [...cart.cartItems, newProduct] };
       }
-    });
 
-    return {
-      ...cart,
-      cartItems: [...cartItems],
-    };
+      // If there are no matches we should just return the cart with the new item
+    } else {
+      const newProduct = { ...payload, quantity: 1 };
+      return { ...cart, cartItems: [...cart.cartItems, newProduct] };
+    }
   }
 
   // Remove item from cart if the quantity is 1
   // or reduce the quantity if there's more than one
   if (action.type === "REMOVE_FROM_CART") {
     const { payload } = action;
-    const item = cart.cartItems.find((product) => product.id === payload.id);
+    // We want to find the item that has the same exact attributes selected to operate on it
+    const item = cart.cartItems.find(
+      (item) =>
+        JSON.stringify(item.attributes) === JSON.stringify(payload.attributes)
+    );
 
+    // If the quantity of the item is more than one, we just want to decrease it
     if (item.quantity > 1) {
       return {
         ...cart,
         cartItems: cart.cartItems.map((item) => {
-          if (item.id === payload.id) {
+          if (
+            JSON.stringify(item.attributes) ===
+            JSON.stringify(payload.attributes)
+          ) {
             return { ...item, quantity: item.quantity - 1 };
           }
           return item;
         }),
       };
+      // If the quantity of the item is equal to one, we want to remove it completely
     } else {
       return {
         ...cart,
-        cartItems: cart.cartItems.filter((item) => item.id !== payload.id),
+        cartItems: cart.cartItems.filter(
+          (item) =>
+            JSON.stringify(item.attributes) !==
+            JSON.stringify(payload.attributes)
+        ),
       };
     }
   }
@@ -195,6 +168,7 @@ const productReducer = (pdp = {}, action) => {
     return { ...pdp, product: item };
   }
 
+  // Select the attribute of a product from a product page
   if (action.type === "SELECT_PRODUCT_ATTRIBUTE") {
     const { payload } = action;
     const itemSpread = {

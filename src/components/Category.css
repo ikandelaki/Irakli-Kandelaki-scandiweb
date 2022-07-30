@@ -24,21 +24,25 @@
   cursor: pointer;
 }
 
+.product-card:hover {
+  box-shadow: 0px 4px 35px rgba(168, 172, 176, 0.3);
+}
+
 .product-details {
-  margin-top: 24px;
+  padding: 24px 16px 16px;
   position: relative;
 }
 
 .product-image {
   width: 354px;
   height: 330px;
-  overflow: hidden;
   position: relative;
 }
 
 .product-image img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 .product-title {

@@ -137,22 +137,27 @@ class ProductDescription extends React.Component {
             ) : null;
           })}
         </div>
+        {product.inStock ? (
+          <div
+            className="pdp-add-to-cart"
+            onClick={() =>
+              this.props.addToCart(this.props.product.product, true)
+            }
+          >
+            Add to cart
+          </div>
+        ) : null}
         <div
-          className="pdp-add-to-cart"
-          onClick={() => this.props.addToCart(this.props.product.product, true)}
-        >
-          Add to cart
-        </div>
-        <div className="pdp-description">
-          {product.description.replace(/<[^>]+>/g, "")}
-        </div>
+          className="pdp-description"
+          dangerouslySetInnerHTML={{ __html: product.description }}
+        ></div>
       </div>
     );
   };
 
   render() {
     return (
-      <div className="pdp pdp-flex">
+      <div className="pdp pdp-grid">
         <div ref={this.imageRef} className="pdp-images-container">
           {this.renderImages()}
         </div>

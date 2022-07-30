@@ -39,11 +39,6 @@ class Category extends React.Component {
     }
   }
 
-  // Puts commas after every thousand to make it more user friendly
-  thousandsWithCommas(x) {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  }
-
   // Rendering the category based on the fetched data
   renderCategory = () => {
     if (!this.state.data) return;
@@ -55,10 +50,7 @@ class Category extends React.Component {
           onMouseEnter={() => this.onProductHover(product.id)}
           onMouseLeave={() => this.onProductLeave()}
         >
-          <Link
-            to={`${product.inStock ? `product/${product.id}` : "/"}`}
-            className="category-link"
-          >
+          <Link to={`product/${product.id}`} className="category-link">
             <div className="product-image">
               <img src={product.gallery[0]} alt="" />
               <div
@@ -80,7 +72,7 @@ class Category extends React.Component {
               {this.props.currency}{" "}
               {product.prices.map((price) =>
                 price.currency.symbol === this.props.currency
-                  ? this.thousandsWithCommas(price.amount)
+                  ? price.amount
                   : null
               )}{" "}
             </div>

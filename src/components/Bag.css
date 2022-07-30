@@ -138,14 +138,6 @@
   font-weight: 500;
 }
 
-.product-picture-cart {
-  width: 200px;
-}
-
-.product-picture-cart img {
-  width: 100%;
-}
-
 /* Styling order items section */
 .order-items {
   display: grid;

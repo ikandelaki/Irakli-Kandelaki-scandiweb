@@ -2,19 +2,19 @@ import React from "react";
 import "./Bag.css";
 
 // importing action creators
-import { selectAttribute, addToCart, removeFromCart } from "../actions";
+import { addToCart, removeFromCart } from "../actions";
 
 // Importing connect to map the state to props
 import { connect } from "react-redux";
 
-import { Link } from "react-router-dom";
+import Slider from "./Slider";
 
 class Bag extends React.Component {
   // Render Attributes of a cart item
   renderAttributes = (item) => {
-    return item.attributes.map((attribute) => {
+    return item.attributes.map((attribute, i) => {
       return (
-        <div key={attribute.id} className="cart-attributes">
+        <div key={i} className="cart-attributes">
           <span className="cart-attribute">{attribute.name}:</span>
           <ul className={`cart-list ${attribute.type}`}>
             {attribute.items.map((attrItem) => {
@@ -23,14 +23,6 @@ class Bag extends React.Component {
                   <li
                     key={attrItem.id}
                     className={`${attrItem.selected ? "active" : ""}`}
-                    onClick={() =>
-                      this.props.selectAttribute(
-                        item,
-                        item.id,
-                        attribute.id,
-                        attrItem.id
-                      )
-                    }
                   >
                     {attrItem.value}
                   </li>
@@ -41,14 +33,6 @@ class Bag extends React.Component {
                     key={attrItem.id}
                     style={{ backgroundColor: attrItem.value }}
                     className={`${attrItem.selected ? "active" : ""}`}
-                    onClick={() =>
-                      this.props.selectAttribute(
-                        item,
-                        item.id,
-                        attribute.id,
-                        attrItem.id
-                      )
-                    }
                   >
                     {" "}
                   </li>
@@ -67,9 +51,9 @@ class Bag extends React.Component {
   renderItems = () => {
     if (!this.props.cart) return;
 
-    return this.props.cart.map((cartItem) => {
+    return this.props.cart.map((cartItem, i) => {
       return (
-        <div className="bag-item-container" key={cartItem.id}>
+        <div className="bag-item-container" key={i}>
           <div className="bag-item-flex">
             <h2>{cartItem.brand}</h2>
             <h3>{cartItem.name}</h3>
@@ -108,21 +92,11 @@ class Bag extends React.Component {
           </div>
         </div>
         <div className="product-picture-cart">
-          <Link
-            to={`/product/${item.id}`}
-            onClick={() => this.props.toggleCart(false)}
-          >
-            <img src={item.gallery[0]} alt="" />
-          </Link>
+          <Slider gallery={item.gallery} />
         </div>
       </div>
     );
   };
-
-  // Puts commas after every thousand to make it more user friendly
-  thousandsWithCommas(x) {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  }
 
   // Calculating the total price of items in cart
   totalPrice = () => {
@@ -154,9 +128,7 @@ class Bag extends React.Component {
               {/* Tax value */}
               <span>
                 {this.props.currency}
-                {this.thousandsWithCommas(
-                  ((this.totalPrice() * 21) / 100).toFixed(2)
-                )}
+                {((this.totalPrice() * 21) / 100).toFixed(2)}
               </span>
               {/* Number of items */}
               <span>
@@ -168,7 +140,7 @@ class Bag extends React.Component {
               {/* Price of items */}
               <span>
                 {this.props.currency}
-                {this.thousandsWithCommas(this.totalPrice())}
+                {this.totalPrice()}
               </span>
             </div>
             <div className="order-btn">Order</div>
@@ -186,7 +158,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {
-  selectAttribute,
   addToCart,
   removeFromCart,
 })(Bag);

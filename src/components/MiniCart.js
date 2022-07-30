@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import { addToCart } from "../actions";
 import { toggleCart } from "../actions";
 import { removeFromCart } from "../actions";
-import { selectAttribute } from "../actions";
 
 class MiniCart extends React.Component {
   // Control the shopping cart toggle
@@ -36,14 +35,6 @@ class MiniCart extends React.Component {
                   <li
                     key={attrItem.id}
                     className={`${attrItem.selected ? "active" : ""}`}
-                    onClick={() =>
-                      this.props.selectAttribute(
-                        item,
-                        item.id,
-                        attribute.id,
-                        attrItem.id
-                      )
-                    }
                   >
                     {attrItem.value}
                   </li>
@@ -54,14 +45,6 @@ class MiniCart extends React.Component {
                     key={attrItem.id}
                     style={{ backgroundColor: attrItem.value }}
                     className={`${attrItem.selected ? "active" : ""}`}
-                    onClick={() =>
-                      this.props.selectAttribute(
-                        item,
-                        item.id,
-                        attribute.id,
-                        attrItem.id
-                      )
-                    }
                   >
                     {" "}
                   </li>
@@ -109,9 +92,10 @@ class MiniCart extends React.Component {
 
   // Render the cart items
   renderItems() {
-    return this.props.cart.map((item) => {
+    return this.props.cart.map((item, i) => {
+      // if (!item.length) return;
       return (
-        <div key={item.id} className="cart-product">
+        <div key={i} className="cart-product">
           {/* Rendering the item name and the price */}
           <div className="cart-product-description">
             <h4>{item.brand}</h4>
@@ -133,24 +117,21 @@ class MiniCart extends React.Component {
     });
   }
 
-  // Puts commas after every thousand to make it more user friendly
-  thousandsWithCommas(x) {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  }
-
   // Calculating the total price of items in cart
   totalPrice = () => {
     const prices = [];
     this.props.cart.forEach((cartItem) => {
+      // if (!cartItem.length) return;
       cartItem.prices.forEach((price) => {
         return price.currency.symbol === this.props.currency
           ? prices.push(price.amount * cartItem.quantity)
           : null;
       });
     });
+
+    // if (!prices.length) return;
     const price = prices.reduce((cur, price) => cur + price).toFixed(2);
-    // Make the price look better by putting commas after every thousand
-    return this.thousandsWithCommas(price);
+    return price;
   };
 
   render() {
@@ -212,5 +193,4 @@ export default connect(mapStateToProps, {
   addToCart,
   removeFromCart,
   toggleCart,
-  selectAttribute,
 })(MiniCart);
