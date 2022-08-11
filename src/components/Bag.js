@@ -60,7 +60,7 @@ class Bag extends React.Component {
             <span className="cart-item-price">
               {cartItem.prices.map((price) => {
                 return price.currency.symbol === this.props.currency
-                  ? price.currency.symbol + "" + price.amount
+                  ? price.currency.symbol + "" + price.amount.toFixed(2)
                   : null;
               })}
             </span>

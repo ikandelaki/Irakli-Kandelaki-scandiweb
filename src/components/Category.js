@@ -72,7 +72,7 @@ class Category extends React.Component {
               {this.props.currency}{" "}
               {product.prices.map((price) =>
                 price.currency.symbol === this.props.currency
-                  ? price.amount
+                  ? price.amount.toFixed(2)
                   : null
               )}{" "}
             </div>

@@ -44,10 +44,30 @@
   justify-content: center;
 }
 
+.selected-image-container div {
+  position: relative;
+}
+
 .selected-image {
   height: 100%;
   width: 100%;
   object-fit: contain;
+}
+
+.out-of-stock-pdp {
+  display: block;
+  position: absolute;
+  background-color: #fff;
+  opacity: 0.5;
+  top: -50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
 }
 
 /* Styling the product details section */

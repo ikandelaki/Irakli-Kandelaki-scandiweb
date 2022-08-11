@@ -10,6 +10,8 @@
   transform: translateY(-20%);
 
   transition: all 0.3s;
+  z-index: 99;
+  background-color: #fff;
 }
 
 .currency-switcher.active {

@@ -103,7 +103,7 @@ class MiniCart extends React.Component {
             <span className="product-price">
               {item.prices.map((price) =>
                 price.currency.symbol === this.props.currency
-                  ? `${price.currency.symbol}${price.amount}`
+                  ? `${price.currency.symbol}${price.amount.toFixed(2)}`
                   : null
               )}
             </span>

@@ -13,6 +13,8 @@ import { addToCart } from "../actions";
 // Importing connect to map the state to props
 import { connect } from "react-redux";
 
+import parse from "html-react-parser";
+
 class ProductDescription extends React.Component {
   constructor(props) {
     super(props);
@@ -54,7 +56,20 @@ class ProductDescription extends React.Component {
 
     return this.props.product.product.gallery.map((image, i) => {
       if (i === this.state.selectedImageId) {
-        return <img key={i} src={image} className="selected-image" alt="" />;
+        return (
+          <div>
+            <img key={i} src={image} className="selected-image" alt="" />
+            <div
+              className={`${
+                this.props.product.product.inStock
+                  ? "in-stock"
+                  : "out-of-stock-pdp"
+              }`}
+            >
+              <p>OUT OF STOCK</p>
+            </div>
+          </div>
+        );
       }
 
       return null;
@@ -132,7 +147,7 @@ class ProductDescription extends React.Component {
             return price.currency.symbol === this.props.currency ? (
               <div className="pdp-price-amount" key={i}>
                 {price.currency.symbol}
-                {price.amount}
+                {price.amount.toFixed(2)}
               </div>
             ) : null;
           })}
@@ -147,10 +162,7 @@ class ProductDescription extends React.Component {
             Add to cart
           </div>
         ) : null}
-        <div
-          className="pdp-description"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        ></div>
+        <div className="pdp-description">{parse(product.description)}</div>
       </div>
     );
   };
